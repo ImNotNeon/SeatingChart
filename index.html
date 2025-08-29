@@ -92,6 +92,11 @@
       </div>
 
       <div id="checkFeedback" style="margin-top:12px" class="muted"></div>
+
+      <!-- Seat plan will show here -->
+      <div id="seatPlan" style="margin-top:20px; display:none;">
+        <img src="SEATPLAN.jpg" alt="Seat Plan" style="max-width:100%; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.2)">
+      </div>
     </div>
   </section>
 
@@ -172,16 +177,24 @@
     searchBtn.addEventListener('click', searchName);
     nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') searchName(); });
 
-    function showCheckin(guest){
-      checkNameEl.textContent = guest.name;
-      checkTableEl.textContent = 'Your table: Table ' + guest.table;
-      checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
-      checkInBtn.disabled = !!guest.checkedIn;
-      showScreen(checkin);
+  function showCheckin(guest){
+    checkNameEl.textContent = guest.name;
+    checkTableEl.textContent = 'Your table: Table ' + guest.table;
+    checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
+    checkInBtn.disabled = !!guest.checkedIn;
+
+    // If already checked in, show seat plan
+    const seatPlan = q('#seatPlan');
+    if (guest.checkedIn) {
+      seatPlan.style.display = 'block';
+    } else {
+      seatPlan.style.display = 'none';
     }
 
-    // CHECK-IN flow (uses GET to avoid POST/CORS issues)
-    async function checkIn(){
+    showScreen(checkin);
+  }
+
+  async function checkIn(){
       if(!foundGuest){ checkFeedback.textContent='No guest selected.'; return; }
       checkInBtn.disabled = true;
       checkFeedback.textContent = 'Checking in...';
@@ -194,13 +207,21 @@
         const resp = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
         const text = await resp.text();
         let data;
-        try { data = JSON.parse(text); } catch(e) { console.error('Non-JSON checkin response:', text); checkFeedback.textContent='Server returned invalid response'; checkInBtn.disabled=false; return; }
+        try { data = JSON.parse(text); } catch(e) { 
+          console.error('Non-JSON checkin response:', text); 
+          checkFeedback.textContent='Server returned invalid response'; 
+          checkInBtn.disabled=false; 
+          return; 
+        }
 
         console.log('checkin response', data);
         if (data && data.success) {
           checkFeedback.textContent = 'Checked in ✅';
           foundGuest.checkedIn = true;
           checkInBtn.disabled = true;
+
+          // Show seat plan now
+          q('#seatPlan').style.display = 'block';
         } else {
           checkFeedback.textContent = data && data.error ? data.error : 'Unable to check in';
           checkInBtn.disabled = false;
