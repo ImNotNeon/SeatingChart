@@ -1,1 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>A | K Seating Chart</title>
+  <style>
+    :root{--accent:#7b2e2e;--muted:#666}
+    *{box-sizing:border-box}
+    body,html{height:100%;margin:0;font-family:Inter,Segoe UI,Helvetica,Arial,sans-serif;background:#f7f7f8;color:#222}
+    .screen{display:none;height:100vh;padding:28px;align-items:center;justify-content:center;flex-direction:column}
+    .active{display:flex}
 
+    /* Intro */
+    .intro{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b7f3502f0f7d7dbe0a1d9b6f0e99f3f') center/cover no-repeat; color:white}
+    .card{background:rgba(255,255,255,0.96);color:#222;padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:920px;width:100%;display:flex;gap:20px}
+    .intro .card{background:transparent;color:white;box-shadow:none;padding:0}
+    h1.title{font-family:'Raleway',sans-serif;font-weight:700;margin:0 0 8px 0;letter-spacing:2px}
+    .couple{display:flex;gap:12px;align-items:center}
+    .couple .photo{width:120px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0}
+    .couple img{width:100%;height:100%;object-fit:cover;display:block}
+    .enter-btn{margin-top:18px;padding:12px 20px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+
+    /* Search */
+    .container{max-width:780px;width:100%;}
+    .search-box{position:relative;display:flex;gap:12px;align-items:center}
+    input[type=text]{flex:1;padding:14px 16px;border-radius:10px;border:1px solid #ddd;font-size:1rem}
+    button.primary{padding:12px 16px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+
+    .result{margin-top:18px;padding:14px;border-radius:10px;background:white;box-shadow:0 6px 18px rgba(20,20,20,.06);width:100%}
+    .muted{color:var(--muted);font-size:.95rem}
+
+    /* Autocomplete */
+    .autocomplete-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-top: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    .autocomplete-suggestions div {
+      padding: 10px;
+      cursor: pointer;
+      font-family: 'Raleway', sans-serif;
+      font-size: 1em;
+      color: #4B2E2E;
+    }
+    .autocomplete-suggestions div:hover {
+      background: #f2f2f2;
+    }
+
+    /* Check-in */
+    .checkin-card{padding:22px;border-radius:12px;background:white;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center}
+    .big{font-weight:700;font-size:1.6rem;margin:10px 0}
+    .small{font-size:.95rem;color:var(--muted)}
+
+    footer{position:fixed;left:12px;bottom:12px;font-size:.85rem;color:var(--muted)}
+
+    @media (max-width:640px){.couple{flex-direction:column;align-items:center}.couple .photo{width:96px;height:96px}}
+  </style>
+</head>
+<body>
+
+  <!-- INTRO SCREEN -->
+  <main id="intro" class="screen intro active">
+    <div class="card container">
+      <div style="flex:1">
+        <h1 class="title">A | K Seating Chart</h1>
+        <p class="muted">Welcome! Tap enter to find your table and check in.</p>
+        <button id="enterBtn" class="enter-btn">Enter</button>
+      </div>
+      <div class="couple">
+        <div class="photo"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9b6f0bf2b2b6f7a1f3a8f7e3" alt="Bride"></div>
+        <div class="photo"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b7f3502f0f7d7dbe0a1d9b6f0e99f3f" alt="Groom"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SEARCH SCREEN -->
+  <section id="search" class="screen">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="margin:0">Find your name</h2>
+        <div class="muted">Type full name (e.g. JUAN DELA CRUZ)</div>
+      </div>
+
+      <div class="search-box">
+        <input id="nameInput" type="text" placeholder="Type full name here" autocomplete="off" />
+        <button id="searchBtn" class="primary">Search</button>
+        <div id="suggestions" class="autocomplete-suggestions" style="display:none"></div>
+      </div>
+
+      <div id="result" class="result" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- CHECK-IN SCREEN -->
+  <section id="checkin" class="screen">
+    <div class="checkin-card container">
+      <div id="checkName" class="big">Guest Name</div>
+      <div id="checkTable" class="muted small">Your table: --</div>
+
+      <div style="margin-top:18px">
+        <button id="checkInBtn" class="primary">Check In</button>
+      </div>
+
+      <div id="checkFeedback" style="margin-top:12px" class="muted"></div>
+    </div>
+  </section>
+
+  <script>
+    // ---------- CONFIG ----------
+    const SCRIPT_URL_SEARCH = 'https://script.google.com/macros/s/AKfycbyN1XlC8jFaLEFm_PbhYFg2Z01WFXytc-AVg1wI4PwBeEPl2Pb5L4Hr-F2-_BVpASN3/exec';
+    const SCRIPT_URL_CHECKIN = 'https://script.google.com/macros/s/AKfycbyN1XlC8jFaLEFm_PbhYFg2Z01WFXytc-AVg1wI4PwBeEPl2Pb5L4Hr-F2-_BVpASN3/exec';
+    // ----------------------------
+
+    const q = sel=>document.querySelector(sel);
+    const intro = q('#intro'), search = q('#search'), checkin = q('#checkin');
+    const enterBtn = q('#enterBtn'), searchBtn = q('#searchBtn'), nameInput = q('#nameInput');
+    const result = q('#result'), suggestions = q('#suggestions');
+    const checkNameEl = q('#checkName'), checkTableEl = q('#checkTable'), checkInBtn = q('#checkInBtn'), checkFeedback = q('#checkFeedback');
+
+    let foundGuest = null;
+    let guestList = [];
+
+    function showScreen(el){[intro,search,checkin].forEach(s=>s.classList.remove('active'));el.classList.add('active');window.scrollTo(0,0)}
+
+    enterBtn.addEventListener('click', ()=>{ showScreen(search); nameInput.focus(); });
+
+    // Load all guests for autocomplete
+    async function loadGuests(){
+      try {
+        const resp = await fetch(SCRIPT_URL_SEARCH + '?allGuests=true');
+        guestList = await resp.json();
+      } catch(err){ console.error("Error loading guest list", err); }
+    }
+    loadGuests();
+
+    // Autocomplete
+    nameInput.addEventListener('input', function(){
+      const query = this.value.trim().toUpperCase();
+      suggestions.innerHTML = '';
+      if(!query){ suggestions.style.display='none'; return; }
+      const matches = guestList.filter(name=>name.includes(query)).slice(0,10);
+      if(matches.length===0){ suggestions.style.display='none'; return; }
+      matches.forEach(match=>{
+        const div=document.createElement('div');
+        div.textContent=match;
+        div.onclick=()=>{ nameInput.value=match; suggestions.style.display='none'; };
+        suggestions.appendChild(div);
+      });
+      suggestions.style.display='block';
+    });
+
+    // SEARCH flow
+    async function searchName(){
+      const raw = nameInput.value.trim();
+      if(!raw){ result.style.display='block'; result.textContent='Please type a name.'; return; }
+      result.style.display='block'; result.textContent='Searching...';
+      suggestions.style.display='none';
+
+      const name = raw.replace(/\s+/g,' ').trim().toUpperCase();
+
+      try{
+        const url = new URL(SCRIPT_URL_SEARCH);
+        url.searchParams.set('name', name);
+
+        const resp = await fetch(url.toString(), { method: 'GET' });
+        if(!resp.ok) throw new Error('Network response was not ok');
+        const data = await resp.json();
+
+        if(!data || data.error || !data.name || !data.table){
+            result.textContent = data.error || "❌ Sorry, we couldn't find your name in the guest list.";
+            foundGuest = null;
+            return;
+        }
+
+        foundGuest = data;
+        result.innerHTML = `<strong>${foundGuest.name} - Table ${foundGuest.table}</strong><div style="margin-top:8px"><button id=proceed class="primary">Proceed</button></div>`;
+        q('#proceed').addEventListener('click', ()=> showCheckin(foundGuest));
+      }catch(err){ console.error(err); result.textContent = 'Error searching — check console and endpoint.'; }
+    }
+
+    searchBtn.addEventListener('click', searchName);
+    nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') searchName(); });
+
+    function showCheckin(guest){
+      checkNameEl.textContent = guest.name;
+      checkTableEl.textContent = 'Your table: ' + guest.table;
+      checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
+      showScreen(checkin);
+    }
+
+    // CHECK-IN flow
+    async function checkIn(){
+        if(!foundGuest){ 
+            checkFeedback.textContent='No guest selected.'; 
+            return; 
+        }
+
+        checkInBtn.disabled = true; 
+        checkFeedback.textContent = 'Checking in...';
+
+        try{
+            const resp = await fetch(SCRIPT_URL_CHECKIN, {
+            method: 'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ name: foundGuest.name.trim().toUpperCase() }) // ensure uppercase
+            });
+
+            const data = await resp.json();
+            console.log("Check-in response:", data);
+
+            if(data.success){ 
+            checkFeedback.textContent = 'Checked in ✅'; 
+            foundGuest.checkedIn = true; 
+            checkInBtn.disabled = true; // lock after success
+            } else {
+            checkFeedback.textContent = data.error || 'Unable to check in';
+            checkInBtn.disabled = false;
+            }
+        }catch(err){ 
+            console.error(err); 
+            checkFeedback.textContent = 'Error checking in — check console.'; 
+            checkInBtn.disabled = false;
+        }
+    }
+    checkInBtn.addEventListener('click', checkIn);
+
+    // Optional: auto-search from query string
+    (function(){
+      const params=new URLSearchParams(location.search);
+      const n=params.get('name');
+      if(n){ nameInput.value=decodeURIComponent(n); showScreen(search); setTimeout(searchName,300); }
+    })();
+  </script>
+</body>
+</html>
