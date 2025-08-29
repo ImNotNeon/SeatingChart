@@ -11,64 +11,46 @@
     .screen{display:none;height:100vh;padding:28px;align-items:center;justify-content:center;flex-direction:column}
     .active{display:flex}
 
-    /* Intro */
-    .intro{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.35)),url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b7f3502f0f7d7dbe0a1d9b6f0e99f3f') center/cover no-repeat; color:white}
-    .card{background:rgba(255,255,255,0.96);color:#222;padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:920px;width:100%;display:flex;gap:20px}
+    /* INTRO PAGE */
+    .intro{
+        background:
+        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), /* lighter fade */
+        url('Wedding.gif') bottom/cover no-repeat;
+        color:white;
+    }
+
+    /* UNIVERSAL BACKGROUND FOR ALL SCREENS */
+    .screen:not(.intro){
+        background:
+        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), /* same light fade */
+        url('Wedding.gif') bottom/cover no-repeat;
+        color:white;
+    }
+
+    .card{background:rgba(255,255,255,0.85);color:#222;padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:920px;width:100%;display:flex;gap:20px}
     .intro .card{background:transparent;color:white;box-shadow:none;padding:0}
     h1.title{font-family:'Raleway',sans-serif;font-weight:700;margin:0 0 8px 0;letter-spacing:2px}
     .couple{display:flex;gap:12px;align-items:center}
     .couple .photo{width:120px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0}
     .couple img{width:100%;height:100%;object-fit:cover;display:block}
     .enter-btn{margin-top:18px;padding:12px 20px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
-
-    /* Search */
     .container{max-width:780px;width:100%;}
     .search-box{position:relative;display:flex;gap:12px;align-items:center}
     input[type=text]{flex:1;padding:14px 16px;border-radius:10px;border:1px solid #ddd;font-size:1rem}
     button.primary{padding:12px 16px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
-
-    .result{margin-top:18px;padding:14px;border-radius:10px;background:white;box-shadow:0 6px 18px rgba(20,20,20,.06);width:100%}
+    .result{margin-top:18px;padding:14px;border-radius:10px;background:rgba(255,255,255,0.9);box-shadow:0 6px 18px rgba(20,20,20,.06);width:100%;color:#222}
     .muted{color:var(--muted);font-size:.95rem}
-
-    /* Autocomplete */
-    .autocomplete-suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-top: 4px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-    .autocomplete-suggestions div {
-      padding: 10px;
-      cursor: pointer;
-      font-family: 'Raleway', sans-serif;
-      font-size: 1em;
-      color: #4B2E2E;
-    }
-    .autocomplete-suggestions div:hover {
-      background: #f2f2f2;
-    }
-
-    /* Check-in */
-    .checkin-card{padding:22px;border-radius:12px;background:white;box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center}
+    .autocomplete-suggestions {position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.08); max-height: 200px; overflow-y: auto; z-index: 1000;}
+    .autocomplete-suggestions div {padding: 10px; cursor: pointer; font-family: 'Raleway', sans-serif; font-size: 1em; color: #4B2E2E;}
+    .autocomplete-suggestions div:hover {background: #f2f2f2;}
+    .checkin-card{padding:22px;border-radius:12px;background:rgba(255,255,255,0.9);box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center;color:#222}
     .big{font-weight:700;font-size:1.6rem;margin:10px 0}
     .small{font-size:.95rem;color:var(--muted)}
-
-    footer{position:fixed;left:12px;bottom:12px;font-size:.85rem;color:var(--muted)}
-
     @media (max-width:640px){.couple{flex-direction:column;align-items:center}.couple .photo{width:96px;height:96px}}
   </style>
 </head>
 <body>
 
-  <!-- INTRO SCREEN -->
   <main id="intro" class="screen intro active">
     <div class="card container">
       <div style="flex:1">
@@ -77,13 +59,12 @@
         <button id="enterBtn" class="enter-btn">Enter</button>
       </div>
       <div class="couple">
-        <div class="photo"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9b6f0bf2b2b6f7a1f3a8f7e3" alt="Bride"></div>
-        <div class="photo"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b7f3502f0f7d7dbe0a1d9b6f0e99f3f" alt="Groom"></div>
+        <div class="photo"><img src="PIC1.jpg" alt="Bride"></div>
+        <div class="photo"><img src="PIC2.jpg" alt="Groom"></div>
       </div>
     </div>
   </main>
 
-  <!-- SEARCH SCREEN -->
   <section id="search" class="screen">
     <div class="container">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -101,7 +82,6 @@
     </div>
   </section>
 
-  <!-- CHECK-IN SCREEN -->
   <section id="checkin" class="screen">
     <div class="checkin-card container">
       <div id="checkName" class="big">Guest Name</div>
@@ -117,8 +97,7 @@
 
   <script>
     // ---------- CONFIG ----------
-    const SCRIPT_URL_SEARCH = 'https://script.google.com/macros/s/AKfycbyN1XlC8jFaLEFm_PbhYFg2Z01WFXytc-AVg1wI4PwBeEPl2Pb5L4Hr-F2-_BVpASN3/exec';
-    const SCRIPT_URL_CHECKIN = 'https://script.google.com/macros/s/AKfycbyN1XlC8jFaLEFm_PbhYFg2Z01WFXytc-AVg1wI4PwBeEPl2Pb5L4Hr-F2-_BVpASN3/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOJ8hCXSE1BawUj9eYq8_TWLTP8pVFUtl-aVYmup7aIsNzXu0owQPYSyJTDn4FlzW3/exec'; // <-- use the /exec URL from Apps Script deployment
     // ----------------------------
 
     const q = sel=>document.querySelector(sel);
@@ -131,24 +110,24 @@
     let guestList = [];
 
     function showScreen(el){[intro,search,checkin].forEach(s=>s.classList.remove('active'));el.classList.add('active');window.scrollTo(0,0)}
-
     enterBtn.addEventListener('click', ()=>{ showScreen(search); nameInput.focus(); });
 
-    // Load all guests for autocomplete
+    // Load autocomplete names
     async function loadGuests(){
       try {
-        const resp = await fetch(SCRIPT_URL_SEARCH + '?allGuests=true');
-        guestList = await resp.json();
-      } catch(err){ console.error("Error loading guest list", err); }
+        const resp = await fetch(SCRIPT_URL + '?allGuests=true');
+        const text = await resp.text();
+        guestList = JSON.parse(text || '[]');
+      } catch(err){ console.error("Error loading guest list", err); guestList = []; }
     }
     loadGuests();
 
-    // Autocomplete
+    // Autocomplete UI
     nameInput.addEventListener('input', function(){
       const query = this.value.trim().toUpperCase();
       suggestions.innerHTML = '';
       if(!query){ suggestions.style.display='none'; return; }
-      const matches = guestList.filter(name=>name.includes(query)).slice(0,10);
+      const matches = guestList.filter(n=>n.includes(query)).slice(0,10);
       if(matches.length===0){ suggestions.style.display='none'; return; }
       matches.forEach(match=>{
         const div=document.createElement('div');
@@ -159,33 +138,35 @@
       suggestions.style.display='block';
     });
 
-    // SEARCH flow
+    // SEARCH flow (uses GET)
     async function searchName(){
       const raw = nameInput.value.trim();
-      if(!raw){ result.style.display='block'; result.textContent='Please type a name.'; return; }
-      result.style.display='block'; result.textContent='Searching...';
+      result.style.display='block';
+      if(!raw){ result.textContent='Please type a name.'; return; }
+      result.textContent='Searching...';
       suggestions.style.display='none';
 
       const name = raw.replace(/\s+/g,' ').trim().toUpperCase();
-
       try{
-        const url = new URL(SCRIPT_URL_SEARCH);
+        const url = new URL(SCRIPT_URL);
         url.searchParams.set('name', name);
-
         const resp = await fetch(url.toString(), { method: 'GET' });
-        if(!resp.ok) throw new Error('Network response was not ok');
-        const data = await resp.json();
+        const text = await resp.text();
+        let data;
+        try { data = JSON.parse(text); } catch (e) { console.error('Non-JSON search response:', text); result.textContent='Server returned invalid response'; return; }
 
-        if(!data || data.error || !data.name || !data.table){
-            result.textContent = data.error || "❌ Sorry, we couldn't find your name in the guest list.";
-            foundGuest = null;
-            return;
+        // handle not found
+        if(!data || data.found !== true){
+          result.textContent = data && data.error ? data.error : "❌ Sorry, we couldn't find your name in the guest list.";
+          foundGuest = null;
+          return;
         }
 
         foundGuest = data;
-        result.innerHTML = `<strong>${foundGuest.name} - Table ${foundGuest.table}</strong><div style="margin-top:8px"><button id=proceed class="primary">Proceed</button></div>`;
+        result.innerHTML = `<strong>${foundGuest.name} - Table ${foundGuest.table}</strong>
+          <div style="margin-top:8px"><button id="proceed" class="primary">Proceed</button></div>`;
         q('#proceed').addEventListener('click', ()=> showCheckin(foundGuest));
-      }catch(err){ console.error(err); result.textContent = 'Error searching — check console and endpoint.'; }
+      } catch(err){ console.error(err); result.textContent = 'Error searching — check console and endpoint.'; }
     }
 
     searchBtn.addEventListener('click', searchName);
@@ -193,48 +174,46 @@
 
     function showCheckin(guest){
       checkNameEl.textContent = guest.name;
-      checkTableEl.textContent = 'Your table: ' + guest.table;
+      checkTableEl.textContent = 'Your table: Table ' + guest.table;
       checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
+      checkInBtn.disabled = !!guest.checkedIn;
       showScreen(checkin);
     }
 
-    // CHECK-IN flow
+    // CHECK-IN flow (uses GET to avoid POST/CORS issues)
     async function checkIn(){
-        if(!foundGuest){ 
-            checkFeedback.textContent='No guest selected.'; 
-            return; 
+      if(!foundGuest){ checkFeedback.textContent='No guest selected.'; return; }
+      checkInBtn.disabled = true;
+      checkFeedback.textContent = 'Checking in...';
+
+      try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('checkIn', 'true');
+        url.searchParams.set('name', foundGuest.name.trim().toUpperCase());
+
+        const resp = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
+        const text = await resp.text();
+        let data;
+        try { data = JSON.parse(text); } catch(e) { console.error('Non-JSON checkin response:', text); checkFeedback.textContent='Server returned invalid response'; checkInBtn.disabled=false; return; }
+
+        console.log('checkin response', data);
+        if (data && data.success) {
+          checkFeedback.textContent = 'Checked in ✅';
+          foundGuest.checkedIn = true;
+          checkInBtn.disabled = true;
+        } else {
+          checkFeedback.textContent = data && data.error ? data.error : 'Unable to check in';
+          checkInBtn.disabled = false;
         }
-
-        checkInBtn.disabled = true; 
-        checkFeedback.textContent = 'Checking in...';
-
-        try{
-            const resp = await fetch(SCRIPT_URL_CHECKIN, {
-            method: 'POST',
-            headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ name: foundGuest.name.trim().toUpperCase() }) // ensure uppercase
-            });
-
-            const data = await resp.json();
-            console.log("Check-in response:", data);
-
-            if(data.success){ 
-            checkFeedback.textContent = 'Checked in ✅'; 
-            foundGuest.checkedIn = true; 
-            checkInBtn.disabled = true; // lock after success
-            } else {
-            checkFeedback.textContent = data.error || 'Unable to check in';
-            checkInBtn.disabled = false;
-            }
-        }catch(err){ 
-            console.error(err); 
-            checkFeedback.textContent = 'Error checking in — check console.'; 
-            checkInBtn.disabled = false;
-        }
+      } catch(err){
+        console.error(err);
+        checkFeedback.textContent = 'Error checking in — check console.';
+        checkInBtn.disabled = false;
+      }
     }
     checkInBtn.addEventListener('click', checkIn);
 
-    // Optional: auto-search from query string
+    // optional auto-search via ?name=...
     (function(){
       const params=new URLSearchParams(location.search);
       const n=params.get('name');
