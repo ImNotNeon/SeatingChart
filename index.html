@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,7 +15,7 @@
     /* INTRO PAGE */
     .intro{
         background:
-        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), /* lighter fade */
+        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), 
         url('Wedding.gif') bottom/cover no-repeat;
         color:white;
     }
@@ -22,7 +23,7 @@
     /* UNIVERSAL BACKGROUND FOR ALL SCREENS */
     .screen:not(.intro){
         background:
-        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), /* same light fade */
+        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), 
         url('Wedding.gif') bottom/cover no-repeat;
         color:white;
     }
@@ -46,6 +47,7 @@
     .checkin-card{padding:22px;border-radius:12px;background:rgba(255,255,255,0.9);box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center;color:#222}
     .big{font-weight:700;font-size:1.6rem;margin:10px 0}
     .small{font-size:.95rem;color:var(--muted)}
+    #seatPlan img{max-width:100%;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
     @media (max-width:640px){.couple{flex-direction:column;align-items:center}.couple .photo{width:96px;height:96px}}
   </style>
 </head>
@@ -93,16 +95,16 @@
 
       <div id="checkFeedback" style="margin-top:12px" class="muted"></div>
 
-      <!-- Seat plan will show here -->
+      <!-- Seat plan -->
       <div id="seatPlan" style="margin-top:20px; display:none;">
-        <img src="SEATPLAN.jpg" alt="Seat Plan" style="max-width:100%; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.2)">
+        <img id="seatPlanImg" src="" alt="Seat Plan">
       </div>
     </div>
   </section>
 
   <script>
     // ---------- CONFIG ----------
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOJ8hCXSE1BawUj9eYq8_TWLTP8pVFUtl-aVYmup7aIsNzXu0owQPYSyJTDn4FlzW3/exec'; // <-- use the /exec URL from Apps Script deployment
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOJ8hCXSE1BawUj9eYq8_TWLTP8pVFUtl-aVYmup7aIsNzXu0owQPYSyJTDn4FlzW3/exec'; 
     // ----------------------------
 
     const q = sel=>document.querySelector(sel);
@@ -110,6 +112,7 @@
     const enterBtn = q('#enterBtn'), searchBtn = q('#searchBtn'), nameInput = q('#nameInput');
     const result = q('#result'), suggestions = q('#suggestions');
     const checkNameEl = q('#checkName'), checkTableEl = q('#checkTable'), checkInBtn = q('#checkInBtn'), checkFeedback = q('#checkFeedback');
+    const seatPlan = q('#seatPlan'), seatPlanImg = q('#seatPlanImg');
 
     let foundGuest = null;
     let guestList = [];
@@ -121,13 +124,12 @@
     async function loadGuests(){
       try {
         const resp = await fetch(SCRIPT_URL + '?allGuests=true');
-        const text = await resp.text();
-        guestList = JSON.parse(text || '[]');
+        guestList = await resp.json();
       } catch(err){ console.error("Error loading guest list", err); guestList = []; }
     }
     loadGuests();
 
-    // Autocomplete UI
+    // Autocomplete
     nameInput.addEventListener('input', function(){
       const query = this.value.trim().toUpperCase();
       suggestions.innerHTML = '';
@@ -143,7 +145,7 @@
       suggestions.style.display='block';
     });
 
-    // SEARCH flow (uses GET)
+    // Search
     async function searchName(){
       const raw = nameInput.value.trim();
       result.style.display='block';
@@ -156,45 +158,46 @@
         const url = new URL(SCRIPT_URL);
         url.searchParams.set('name', name);
         const resp = await fetch(url.toString(), { method: 'GET' });
-        const text = await resp.text();
-        let data;
-        try { data = JSON.parse(text); } catch (e) { console.error('Non-JSON search response:', text); result.textContent='Server returned invalid response'; return; }
+        const data = await resp.json();
 
-        // handle not found
         if(!data || data.found !== true){
-          result.textContent = data && data.error ? data.error : "❌ Sorry, we couldn't find your name in the guest list.";
+          result.textContent = data && data.error ? data.error : "❌ Sorry, we couldn't find your name.";
           foundGuest = null;
           return;
         }
 
         foundGuest = data;
         result.innerHTML = `<strong>${foundGuest.name} - Table ${foundGuest.table}</strong>
-          <div style="margin-top:8px"><button id="proceed" class="primary">Proceed</button></div>`;
+          <div style="margin-top:8px"><button id="proceed" class="primary">Check In</button></div>`;
         q('#proceed').addEventListener('click', ()=> showCheckin(foundGuest));
-      } catch(err){ console.error(err); result.textContent = 'Error searching — check console and endpoint.'; }
+      } catch(err){ console.error(err); result.textContent = 'Error searching.'; }
     }
 
     searchBtn.addEventListener('click', searchName);
     nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') searchName(); });
 
-  function showCheckin(guest){
-    checkNameEl.textContent = guest.name;
-    checkTableEl.textContent = 'Your table: Table ' + guest.table;
-    checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
-    checkInBtn.disabled = !!guest.checkedIn;
+    function showCheckin(guest){
+      checkNameEl.textContent = guest.name;
+      checkTableEl.textContent = 'Your table: Table ' + guest.table;
+      checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
+      
+      if (guest.checkedIn) {
+        checkInBtn.style.display = 'none';
+      } else {
+        checkInBtn.style.display = 'inline-block';
+      }
 
-    // If already checked in, show seat plan
-    const seatPlan = q('#seatPlan');
-    if (guest.checkedIn) {
-      seatPlan.style.display = 'block';
-    } else {
-      seatPlan.style.display = 'none';
+      // Show correct seat plan image if already checked in
+      if (guest.checkedIn) {
+        seatPlanImg.src = `seatplan-${guest.table}.jpg`; // dynamic seat plan file
+        seatPlan.style.display = 'block';
+      } else {
+        seatPlan.style.display = 'none';
+      }
+      showScreen(checkin);
     }
 
-    showScreen(checkin);
-  }
-
-  async function checkIn(){
+    async function checkIn(){
       if(!foundGuest){ checkFeedback.textContent='No guest selected.'; return; }
       checkInBtn.disabled = true;
       checkFeedback.textContent = 'Checking in...';
@@ -205,30 +208,23 @@
         url.searchParams.set('name', foundGuest.name.trim().toUpperCase());
 
         const resp = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
-        const text = await resp.text();
-        let data;
-        try { data = JSON.parse(text); } catch(e) { 
-          console.error('Non-JSON checkin response:', text); 
-          checkFeedback.textContent='Server returned invalid response'; 
-          checkInBtn.disabled=false; 
-          return; 
-        }
+        const data = await resp.json();
 
-        console.log('checkin response', data);
         if (data && data.success) {
           checkFeedback.textContent = 'Checked in ✅';
           foundGuest.checkedIn = true;
           checkInBtn.disabled = true;
 
-          // Show seat plan now
-          q('#seatPlan').style.display = 'block';
+          // Show correct seat plan after check-in
+          seatPlanImg.src = `seatplan-${foundGuest.table}.jpg`;
+          seatPlan.style.display = 'block';
         } else {
           checkFeedback.textContent = data && data.error ? data.error : 'Unable to check in';
           checkInBtn.disabled = false;
         }
       } catch(err){
         console.error(err);
-        checkFeedback.textContent = 'Error checking in — check console.';
+        checkFeedback.textContent = 'Error checking in.';
         checkInBtn.disabled = false;
       }
     }
