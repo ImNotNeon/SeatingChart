@@ -26,7 +26,6 @@ The system follows a lightweight web-based architecture:
 - **Backend (Google Apps Script):** Processes requests and manages application logic  
 - **Database (Google Sheets):** Stores guest list, table assignments, and check-in status  
 
-This structure allows for easy deployment, scalability, and minimal maintenance.
 
 ---
 
@@ -61,5 +60,5 @@ This structure allows for easy deployment, scalability, and minimal maintenance.
 
 ## Author
 
-Developed by [Your Name]  
+Developed by Jenrick Lim
 B.S. Computer Science – Software Technology
