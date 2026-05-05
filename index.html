@@ -1,110 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>A | K Seating Chart</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&family=Tinos:wght@700&family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
   <style>
-    :root{--accent:#7b2e2e;--muted:#666}
-    *{box-sizing:border-box}
-    body,html{height:100%;margin:0;font-family:Inter,Segoe UI,Helvetica,Arial,sans-serif;background:#f7f7f8;color:#222}
-    .screen{display:none;height:100vh;padding:28px;align-items:center;justify-content:center;flex-direction:column}
-    .active{display:flex}
-
-    /* INTRO PAGE */
-    .intro{
-        background:
-        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), 
-        url('Wedding.gif') bottom/cover no-repeat;
-        color:white;
+    /* Cohesive Color Palette */
+    :root {
+      --accent: #b5aba4;
+      --dark-text: #4B2E2E;
+      --bg-color: #c3bdb5;
+      --card-bg: #d4d0c7;
     }
 
-    /* UNIVERSAL BACKGROUND FOR ALL SCREENS */
-    .screen:not(.intro){
-        background:
-        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%), 
-        url('Wedding.gif') bottom/cover no-repeat;
-        color:white;
+    * { box-sizing: border-box; }
+
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: 'Raleway', sans-serif;
+      background: var(--bg-color) url('Wedding.gif') no-repeat center bottom fixed;
+      background-size: cover;
+      color: var(--dark-text);
+      text-align: center;
     }
 
-    .card{background:rgba(255,255,255,0.85);color:#222;padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);max-width:920px;width:100%;display:flex;gap:20px}
-    .intro .card{background:transparent;color:white;box-shadow:none;padding:0}
-    h1.title{font-family:'Raleway',sans-serif;font-weight:700;margin:0 0 8px 0;letter-spacing:2px}
-    .couple{display:flex;gap:12px;align-items:center}
-    .couple .photo{width:120px;height:120px;border-radius:12px;overflow:hidden;flex-shrink:0}
-    .couple img{width:100%;height:100%;object-fit:cover;display:block}
-    .enter-btn{margin-top:18px;padding:12px 20px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
-    .container{max-width:780px;width:100%;}
-    .search-box{position:relative;display:flex;gap:12px;align-items:center}
-    input[type=text]{flex:1;padding:14px 16px;border-radius:10px;border:1px solid #ddd;font-size:1rem}
-    button.primary{padding:12px 16px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
-    .result{margin-top:18px;padding:14px;border-radius:10px;background:rgba(255,255,255,0.9);box-shadow:0 6px 18px rgba(20,20,20,.06);width:100%;color:#222}
-    .muted{color:var(--muted);font-size:.95rem}
-    .autocomplete-suggestions {position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.08); max-height: 200px; overflow-y: auto; z-index: 1000;}
-    .autocomplete-suggestions div {padding: 10px; cursor: pointer; font-family: 'Raleway', sans-serif; font-size: 1em; color: #4B2E2E;}
-    .autocomplete-suggestions div:hover {background: #f2f2f2;}
-    .checkin-card{padding:22px;border-radius:12px;background:rgba(255,255,255,0.9);box-shadow:0 10px 30px rgba(0,0,0,.08);text-align:center;color:#222}
-    .big{font-weight:700;font-size:1.6rem;margin:10px 0}
-    .small{font-size:.95rem;color:var(--muted)}
-    #seatPlan img{max-width:100%;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
-    @media (max-width:640px){.couple{flex-direction:column;align-items:center}.couple .photo{width:96px;height:96px}}
+    /* Screen Transitions */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 40px 20px;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card Styling - Matching the RSVP Screens */
+    .container {
+      max-width: 420px;
+      width: 100%;
+      margin-top: 15vh; /* Pushes content down to show the GIF */
+    }
+
+    .card-style {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+      width: 100%;
+    }
+
+    /* Typography */
+    h1, h2 {
+      font-family: 'Tinos', serif;
+      font-weight: 700;
+      color: var(--dark-text);
+    }
+
+    .title { font-size: 2.2em; margin-bottom: 10px; }
+    .muted { font-family: 'Montserrat', sans-serif; font-size: 0.9em; margin-bottom: 15px; }
+
+    /* Button Styling - Matching RSVP Buttons */
+    button {
+      font-family: 'Raleway', sans-serif;
+      background: #b5aba4;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover { background: #a39891; transform: scale(1.05); }
+    button.primary { background: #4B2E2E; width: 100%; margin-top: 10px; }
+
+    /* Search Box & Inputs */
+    .search-box { width: 100%; position: relative; }
+
+    input[type=text] {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 50px; /* Rounded look from RSVP page */
+      border: none;
+      background: #c4baa3;
+      color: #3e362b;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    input::placeholder { color: #5a5246; }
+
+    /* Autocomplete Dropdown */
+    .autocomplete-suggestions {
+      position: absolute;
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .autocomplete-suggestions div {
+      padding: 12px;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* Result Box */
+    .result {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 15px;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Photo Styling */
+    .couple { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+    .photo { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid white; }
+    .photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    #seatPlan img {
+      max-width: 100%;
+      border: 5px solid white;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
 
-  <main id="intro" class="screen intro active">
-    <div class="card container">
-      <div style="flex:1">
-        <h1 class="title">A | K Seating Chart</h1>
-        <p class="muted">Welcome! Tap enter to find your table and check in.</p>
-        <button id="enterBtn" class="enter-btn">Enter</button>
-      </div>
-      <div class="couple">
-        <div class="photo"><img src="PIC1.jpg" alt="Bride"></div>
-        <div class="photo"><img src="PIC2.jpg" alt="Groom"></div>
-      </div>
+  <main id="intro" class="screen active">
+    <div class="container">
+        <h1 class="title">A | K</h1>
+        <p class="muted">Find your seat and join us in celebration.</p>
+        <button id="enterBtn">Enter Table Map</button>
+        
+        <div class="couple">
+            <div class="photo"><img src="PIC1.jpg" alt="Bride"></div>
+            <div class="photo"><img src="PIC2.jpg" alt="Groom"></div>
+        </div>
     </div>
   </main>
 
   <section id="search" class="screen">
     <div class="container">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <h2 style="margin:0">Find your name</h2>
-        <div class="muted">Type full name (e.g. JUAN DELA CRUZ)</div>
-      </div>
-
-      <div class="search-box">
-        <input id="nameInput" type="text" placeholder="Type full name here" autocomplete="off" />
+      <div class="card-style">
+        <h2>Find Your Name</h2>
+        <div class="search-box">
+          <input id="nameInput" type="text" placeholder="🔍 ENTER FULL NAME" autocomplete="off" />
+          <div id="suggestions" class="autocomplete-suggestions" style="display:none"></div>
+        </div>
         <button id="searchBtn" class="primary">Search</button>
-        <div id="suggestions" class="autocomplete-suggestions" style="display:none"></div>
+        <div id="result" class="result" style="display:none"></div>
       </div>
-
-      <div id="result" class="result" style="display:none"></div>
     </div>
   </section>
 
   <section id="checkin" class="screen">
-    <div class="checkin-card container">
-      <div id="checkName" class="big">Guest Name</div>
-      <div id="checkTable" class="muted small">Your table: --</div>
+    <div class="container card-style">
+      <div id="checkName" style="font-family: Tinos; font-size: 1.8em; font-weight: 700;">Guest Name</div>
+      <div id="checkTable" class="muted" style="font-size: 1.2em; margin-top: 10px;">Your table: --</div>
 
       <div style="margin-top:18px">
-        <button id="checkInBtn" class="primary">Check In</button>
+        <button id="checkInBtn" class="primary">Confirm Arrival</button>
       </div>
 
-      <div id="checkFeedback" style="margin-top:12px" class="muted"></div>
+      <div id="checkFeedback" style="margin-top:12px; font-weight: 600;"></div>
 
-      <!-- Seat plan -->
-      <div id="seatPlan" style="margin-top:20px; display:none;">
+      <div id="seatPlan" style="display:none;">
         <img id="seatPlanImg" src="" alt="Seat Plan">
       </div>
     </div>
   </section>
 
   <script>
-    // ---------- CONFIG ---------- //
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOJ8hCXSE1BawUj9eYq8_TWLTP8pVFUtl-aVYmup7aIsNzXu0owQPYSyJTDn4FlzW3/exec'; 
-    // ---------------------------- //
 
     const q = sel=>document.querySelector(sel);
     const intro = q('#intro'), search = q('#search'), checkin = q('#checkin');
@@ -119,7 +208,6 @@
     function showScreen(el){[intro,search,checkin].forEach(s=>s.classList.remove('active'));el.classList.add('active');window.scrollTo(0,0)}
     enterBtn.addEventListener('click', ()=>{ showScreen(search); nameInput.focus(); });
 
-    // Load autocomplete names
     async function loadGuests(){
       try {
         const resp = await fetch(SCRIPT_URL + '?allGuests=true');
@@ -128,27 +216,25 @@
     }
     loadGuests();
 
-    // Autocomplete
     nameInput.addEventListener('input', function(){
       const query = this.value.trim().toUpperCase();
       suggestions.innerHTML = '';
       if(!query){ suggestions.style.display='none'; return; }
       const matches = guestList.filter(n=>n.includes(query)).slice(0,10);
       if(matches.length===0){ suggestions.style.display='none'; return; }
+      suggestions.style.display='block';
       matches.forEach(match=>{
         const div=document.createElement('div');
         div.textContent=match;
         div.onclick=()=>{ nameInput.value=match; suggestions.style.display='none'; };
         suggestions.appendChild(div);
       });
-      suggestions.style.display='block';
     });
 
-    // Search
     async function searchName(){
       const raw = nameInput.value.trim();
+      if(!raw){ return; }
       result.style.display='block';
-      if(!raw){ result.textContent='Please type a name.'; return; }
       result.textContent='Searching...';
       suggestions.style.display='none';
 
@@ -156,20 +242,19 @@
       try{
         const url = new URL(SCRIPT_URL);
         url.searchParams.set('name', name);
-        const resp = await fetch(url.toString(), { method: 'GET' });
+        const resp = await fetch(url.toString());
         const data = await resp.json();
 
         if(!data || data.found !== true){
-          result.textContent = data && data.error ? data.error : "❌ Sorry, we couldn't find your name.";
-          foundGuest = null;
+          result.textContent = "❌ Name not found.";
           return;
         }
 
         foundGuest = data;
-        result.innerHTML = `<strong>${foundGuest.name} - Table ${foundGuest.table}</strong>
-          <div style="margin-top:8px"><button id="proceed" class="primary">Check In</button></div>`;
+        result.innerHTML = `<strong>${foundGuest.name}</strong><br>Table ${foundGuest.table}
+          <button id="proceed" class="primary">View My Map</button>`;
         q('#proceed').addEventListener('click', ()=> showCheckin(foundGuest));
-      } catch(err){ console.error(err); result.textContent = 'Error searching.'; }
+      } catch(err){ result.textContent = 'Error searching.'; }
     }
 
     searchBtn.addEventListener('click', searchName);
@@ -177,18 +262,12 @@
 
     function showCheckin(guest){
       checkNameEl.textContent = guest.name;
-      checkTableEl.textContent = 'Your table: Table ' + guest.table;
+      checkTableEl.textContent = 'You are at Table ' + guest.table;
       checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
+      checkInBtn.style.display = guest.checkedIn ? 'none' : 'inline-block';
       
       if (guest.checkedIn) {
-        checkInBtn.style.display = 'none';
-      } else {
-        checkInBtn.style.display = 'inline-block';
-      }
-
-      // Show correct seat plan image if already checked in
-      if (guest.checkedIn) {
-        seatPlanImg.src = `seatplan-${guest.table}.jpg`; // dynamic seat plan file
+        seatPlanImg.src = `seatplan-${guest.table}.jpg`;
         seatPlan.style.display = 'block';
       } else {
         seatPlan.style.display = 'none';
@@ -197,7 +276,7 @@
     }
 
     async function checkIn(){
-      if(!foundGuest){ checkFeedback.textContent='No guest selected.'; return; }
+      if(!foundGuest){ return; }
       checkInBtn.disabled = true;
       checkFeedback.textContent = 'Checking in...';
 
@@ -206,35 +285,21 @@
         url.searchParams.set('checkIn', 'true');
         url.searchParams.set('name', foundGuest.name.trim().toUpperCase());
 
-        const resp = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
+        const resp = await fetch(url.toString());
         const data = await resp.json();
 
         if (data && data.success) {
-          checkFeedback.textContent = 'Checked in ✅';
-          foundGuest.checkedIn = true;
-          checkInBtn.disabled = true;
-
-          // Show correct seat plan after check-in
+          checkFeedback.textContent = 'Welcome! ✅';
           seatPlanImg.src = `seatplan-${foundGuest.table}.jpg`;
           seatPlan.style.display = 'block';
-        } else {
-          checkFeedback.textContent = data && data.error ? data.error : 'Unable to check in';
-          checkInBtn.disabled = false;
+          checkInBtn.style.display = 'none';
         }
       } catch(err){
-        console.error(err);
-        checkFeedback.textContent = 'Error checking in.';
+        checkFeedback.textContent = 'Error connecting.';
         checkInBtn.disabled = false;
       }
     }
     checkInBtn.addEventListener('click', checkIn);
-
-    // optional auto-search via ?name=...
-    (function(){
-      const params=new URLSearchParams(location.search);
-      const n=params.get('name');
-      if(n){ nameInput.value=decodeURIComponent(n); showScreen(search); setTimeout(searchName,300); }
-    })();
   </script>
 </body>
 </html>
