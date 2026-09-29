@@ -1,169 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A | K Seating Chart</title>
-  
+
+  <link rel="stylesheet" href="index.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&family=Forum&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
-  <main id="intro" class="screen active">
-    <div class="container">
-        <h1 class="title">A | K</h1>
-        <p class="muted">Find your seat and join us in celebration.</p>
-        <button id="enterBtn">Enter Table Map</button>
-        
-        <div class="couple">
-            <div class="photo"><img src="PIC1.jpg" alt="Bride"></div>
-            <div class="photo"><img src="PIC2.jpg" alt="Groom"></div>
-        </div>
-    </div>
-  </main>
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-label">Please wait…</div>
+</div>
 
-  <section id="search" class="screen">
-    <div class="container">
-      <div class="card-style">
-        <h2>Find Your Name</h2>
-        <div class="search-box">
-          <input id="nameInput" type="text" placeholder="🔍 ENTER FULL NAME" autocomplete="off" />
-          <div id="suggestions" class="autocomplete-suggestions" style="display:none"></div>
-        </div>
-        <button id="searchBtn" class="primary">Search</button>
-        <div id="result" class="result" style="display:none"></div>
+<button id="backBtn" class="back-fab" onclick="goBack()" aria-label="Go back">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 14 L4 9 L9 4" />
+    <path d="M4 9 Q12 9 14 12 Q17 16 17 20" />
+  </svg>
+</button>
+
+<!-- PAGE 1 — FIND YOUR SEAT -->
+<div id="page-find" class="page active">
+  <div class="logo-block">
+    <div class="chi-icon"><img src="RSVP-Chi-Logo.png" alt="" onerror="this.style.display='none'"></div>
+  </div>
+  <div class="rule rule-wide"></div>
+  <div class="big-ak">
+    <img src="RSVP-AK-Logo.png" alt="ak" onerror="this.outerHTML='ak'">
+  </div>
+  <div class="rule rule-wide"></div>
+
+  <p class="dash-label">Find your seat</p>
+
+  <div class="name-field-wrap">
+    <div class="name-input-row">
+      <input type="text" id="guestNameInput" class="name-input" placeholder="Enter your name here" autocomplete="off" />
+      <div id="nameLoadingSpinner" class="name-spinner" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="var(--stone)" stroke-width="2.5"/>
+          <path d="M12 3 A9 9 0 0 1 21 12" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
       </div>
     </div>
-  </section>
+    <div id="autocomplete-list" class="autocomplete-list"></div>
+  </div>
 
-  <section id="checkin" class="screen">
-    <div class="container card-style">
-      <div id="checkName" style="font-family: Tinos; font-size: 1.8em; font-weight: 700;">Guest Name</div>
-      <div id="checkTable" class="muted" style="font-size: 1.2em; margin-top: 10px;">Your table: --</div>
+  <button class="cta-btn dark" onclick="checkIn()" style="width:85%;">Check In</button>
+</div>
 
-      <div style="margin-top:18px">
-        <button id="checkInBtn" class="primary">Confirm Arrival</button>
-      </div>
+<!-- PAGE 2 — TABLE + SEATMATES -->
+<div id="page-table" class="page">
+  <div class="logo-block">
+    <div class="ak-logo"><img src="Logo.png" alt="ak" onerror="this.outerHTML='<span>ak</span>'"></div>
+  </div>
 
-      <div id="checkFeedback" style="margin-top:12px; font-weight: 600;"></div>
+  <p class="seats-hero-label">Table Number</p>
+  <div class="seats-number-box"><span id="tableNum" class="table-num">--</span></div>
 
-      <div id="seatPlan" style="display:none;">
-        <img id="seatPlanImg" src="" alt="Seat Plan">
-      </div>
-    </div>
-  </section>
+  <p class="seated-with">You're seated with</p>
+  <div class="rule rule-wide"></div>
+  <div id="mateList" class="mate-list"></div>
 
-  <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOJ8hCXSE1BawUj9eYq8_TWLTP8pVFUtl-aVYmup7aIsNzXu0owQPYSyJTDn4FlzW3/exec'; 
+  <button class="cta-btn dark" onclick="show('page-map')" style="margin-top:18px;">View Site Map</button>
+</div>
 
-    const q = sel=>document.querySelector(sel);
-    const intro = q('#intro'), search = q('#search'), checkin = q('#checkin');
-    const enterBtn = q('#enterBtn'), searchBtn = q('#searchBtn'), nameInput = q('#nameInput');
-    const result = q('#result'), suggestions = q('#suggestions');
-    const checkNameEl = q('#checkName'), checkTableEl = q('#checkTable'), checkInBtn = q('#checkInBtn'), checkFeedback = q('#checkFeedback');
-    const seatPlan = q('#seatPlan'), seatPlanImg = q('#seatPlanImg');
+<!-- PAGE 3 — VENUE MAP -->
+<div id="page-map" class="page">
+  <div class="logo-block">
+    <div class="ak-logo"><img src="Logo.png" alt="ak" onerror="this.outerHTML='<span>ak</span>'"></div>
+  </div>
 
-    let foundGuest = null;
-    let guestList = [];
+  <p class="seats-hero-label">Table <span id="mapTableNum">--</span></p>
+  <div class="map-frame" onclick="openMap()">
+    <img id="mapImg" src="" alt="Seat plan" onerror="mapMissing()">
+  </div>
+  <p class="map-hint" id="mapHint">Tap map to enlarge</p>
 
-    function showScreen(el){[intro,search,checkin].forEach(s=>s.classList.remove('active'));el.classList.add('active');window.scrollTo(0,0)}
-    enterBtn.addEventListener('click', ()=>{ showScreen(search); nameInput.focus(); });
+  <button class="cta-btn dark" onclick="show('page-welcome')" style="margin-top:18px;">Continue</button>
+</div>
 
-    async function loadGuests(){
-      try {
-        const resp = await fetch(SCRIPT_URL + '?allGuests=true');
-        guestList = await resp.json();
-      } catch(err){ console.error("Error loading guest list", err); guestList = []; }
+<div id="mapViewer" onclick="closeMap()">
+  <img id="mapViewerImg" src="" alt="Seat plan enlarged">
+  <button class="map-close" aria-label="Close map">✕</button>
+</div>
+
+<!-- PAGE 4 — WELCOME -->
+<div id="page-welcome" class="page">
+  <div class="logo-block">
+    <div class="chi-icon"><img src="RSVP-Chi-Logo.png" alt="" onerror="this.style.display='none'"></div>
+    <div class="rule rule-wide"></div>
+  </div>
+
+  <p class="welcome-title">Welcome</p>
+
+  <p class="grateful-body">
+    Thank you for taking the time to witness our union and celebrate this special day with us.<br><br>
+    Your presence is a gift we will always cherish. We hope you enjoy the evening!
+  </p>
+
+  <div class="rule rule-wide" style="margin-top:28px;"></div>
+  <p class="grateful-sig">With Love,<br>Auds and Ten</p>
+
+  <div class="ticket-card" onclick="resetToFront()">
+    <img src="ReturnButton.png" alt="Return to front page">
+  </div>
+</div>
+
+<div id="customModal" class="modal-overlay">
+  <div class="modal-box">
+    <p id="modalMessage"></p>
+    <button class="cta-btn dark" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+  /* Paste your deployed Apps Script web app URL here */
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx9dNpsQDKsoeyOZuFbu5PSAXDjSROS6f6uEus-qrHqMLbmMk7QGVlvdm7AapUy-7_n/exec";
+
+  let guestList = [];
+  let pageHistory = [];
+  const NO_BACK_PAGES = new Set(['page-find', 'page-welcome']);
+
+  const input   = document.getElementById('guestNameInput');
+  const suggBox = document.getElementById('autocomplete-list');
+
+  /* ── Navigation (same pattern as RSVP) ── */
+  function show(pageId, pushHistory = true) {
+    const current = document.querySelector('.page.active');
+    const currentId = current ? current.id : null;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) { target.classList.add('active'); target.scrollTop = 0; }
+    if (pushHistory && currentId && currentId !== pageId) pageHistory.push(currentId);
+    document.getElementById('backBtn').classList.toggle(
+      'back-fab--visible', !(NO_BACK_PAGES.has(pageId) || pageHistory.length === 0));
+  }
+  function goBack() {
+    if (!pageHistory.length) return;
+    show(pageHistory.pop(), false);
+  }
+  function resetToFront() {
+    pageHistory = [];
+    input.value = '';
+    show('page-find', false);
+  }
+
+  function showModal(msg) {
+    document.getElementById('modalMessage').innerText = msg;
+    document.getElementById('customModal').style.display = 'flex';
+  }
+  function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
+  function toggleLoading(on, text = 'Please wait…') {
+    const o = document.getElementById('loadingOverlay');
+    o.querySelector('.loading-label').innerText = text;
+    o.style.display = on ? 'flex' : 'none';
+  }
+
+  const normalize = s => s.replace(/\s+/g, ' ').trim().toUpperCase();
+
+  /* ── Load guest names for autocomplete ── */
+  async function loadGuests() {
+    const spinner = document.getElementById('nameLoadingSpinner');
+    spinner.style.display = 'flex';
+    input.placeholder = 'Loading guest list…';
+    try {
+      const res = await fetch(WEB_APP_URL);
+      guestList = await res.json();
+    } catch (err) { console.error('Could not load guest list:', err); }
+    finally {
+      spinner.style.display = 'none';
+      input.placeholder = 'Enter your name here';
     }
-    loadGuests();
+  }
+  loadGuests();
 
-    nameInput.addEventListener('input', function(){
-      const query = this.value.trim().toUpperCase();
-      suggestions.innerHTML = '';
-      if(!query){ suggestions.style.display='none'; return; }
-      const matches = guestList.filter(n=>n.includes(query)).slice(0,10);
-      if(matches.length===0){ suggestions.style.display='none'; return; }
-      suggestions.style.display='block';
-      matches.forEach(match=>{
-        const div=document.createElement('div');
-        div.textContent=match;
-        div.onclick=()=>{ nameInput.value=match; suggestions.style.display='none'; };
-        suggestions.appendChild(div);
-      });
+  input.addEventListener('input', function () {
+    const q = normalize(this.value);
+    suggBox.innerHTML = '';
+    if (!q) { suggBox.style.display = 'none'; return; }
+    const matches = guestList.filter(n => n.includes(q)).slice(0, 8);
+    if (!matches.length) { suggBox.style.display = 'none'; return; }
+    suggBox.style.display = 'block';
+    matches.forEach(m => {
+      const div = document.createElement('div');
+      div.innerText = m;
+      div.onclick = () => { input.value = m; suggBox.style.display = 'none'; };
+      suggBox.appendChild(div);
+    });
+  });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') checkIn(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.name-field-wrap')) suggBox.style.display = 'none';
+  });
+
+  /* ── Check in: looks up the guest, marks them checked in, returns table + seatmates ── */
+  async function checkIn() {
+    const name = normalize(input.value);
+    suggBox.style.display = 'none';
+    if (!name) { showModal('Please enter your name.'); return; }
+    if (guestList.length && !guestList.includes(name)) {
+      showModal('Name not found. Please pick your name from the suggestions or enter it as written on your invitation.');
+      return;
+    }
+
+    toggleLoading(true, 'Checking in…');
+    try {
+      const res  = await fetch(WEB_APP_URL + '?action=checkIn&name=' + encodeURIComponent(name));
+      const data = await res.json();
+      toggleLoading(false);
+      if (!data.found) { showModal('Name not found. Please check the spelling and try again.'); return; }
+      renderTable(data);
+      show('page-table');
+    } catch (err) {
+      toggleLoading(false);
+      showModal('Error connecting to server. Please check your internet connection.');
+    }
+  }
+
+  function renderTable(data) {
+    document.getElementById('tableNum').innerText = data.table;
+    document.getElementById('mapTableNum').innerText = data.table;
+
+    const list = document.getElementById('mateList');
+    list.innerHTML = '';
+    data.tablemates.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'mate-name';
+      div.textContent = n;
+      list.appendChild(div);
     });
 
-    async function searchName(){
-      const raw = nameInput.value.trim();
-      if(!raw){ return; }
-      result.style.display='block';
-      result.textContent='Searching...';
-      suggestions.style.display='none';
+    document.getElementById('mapHint').style.display = 'block';
+    document.getElementById('mapImg').src = 'seatplan-' + data.table + '.png';
+  }
 
-      const name = raw.replace(/\s+/g,' ').trim().toUpperCase();
-      try{
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('name', name);
-        const resp = await fetch(url.toString());
-        const data = await resp.json();
-
-        if(!data || data.found !== true){
-          result.textContent = "❌ Name not found.";
-          return;
-        }
-
-        foundGuest = data;
-        result.innerHTML = `<strong>${foundGuest.name}</strong><br>Table ${foundGuest.table}
-          <button id="proceed" class="primary">View My Map</button>`;
-        q('#proceed').addEventListener('click', ()=> showCheckin(foundGuest));
-      } catch(err){ result.textContent = 'Error searching.'; }
-    }
-
-    searchBtn.addEventListener('click', searchName);
-    nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') searchName(); });
-
-    function showCheckin(guest){
-      checkNameEl.textContent = guest.name;
-      checkTableEl.textContent = 'You are at Table ' + guest.table;
-      checkFeedback.textContent = guest.checkedIn ? 'Already checked in ✅' : '';
-      checkInBtn.style.display = guest.checkedIn ? 'none' : 'inline-block';
-      
-      if (guest.checkedIn) {
-        seatPlanImg.src = `seatplan-${guest.table}.jpg`;
-        seatPlan.style.display = 'block';
-      } else {
-        seatPlan.style.display = 'none';
-      }
-      showScreen(checkin);
-    }
-
-    async function checkIn(){
-      if(!foundGuest){ return; }
-      checkInBtn.disabled = true;
-      checkFeedback.textContent = 'Checking in...';
-
-      try {
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('checkIn', 'true');
-        url.searchParams.set('name', foundGuest.name.trim().toUpperCase());
-
-        const resp = await fetch(url.toString());
-        const data = await resp.json();
-
-        if (data && data.success) {
-          checkFeedback.textContent = 'Welcome! ✅';
-          seatPlanImg.src = `seatplan-${foundGuest.table}.jpg`;
-          seatPlan.style.display = 'block';
-          checkInBtn.style.display = 'none';
-        }
-      } catch(err){
-        checkFeedback.textContent = 'Error connecting.';
-        checkInBtn.disabled = false;
-      }
-    }
-    checkInBtn.addEventListener('click', checkIn);
-  </script>
+  /* ── Map ── */
+  function openMap() {
+    document.getElementById('mapViewerImg').src = document.getElementById('mapImg').src;
+    document.getElementById('mapViewer').style.display = 'block';
+  }
+  function closeMap() { document.getElementById('mapViewer').style.display = 'none'; }
+  function mapMissing() { document.getElementById('mapHint').style.display = 'none'; }
+</script>
 </body>
 </html>
