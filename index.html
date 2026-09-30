@@ -6,6 +6,8 @@
   <title>A | K Seating Chart</title>
 
   <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&family=Forum&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -119,10 +121,10 @@
 </div>
 
 <script>
-  /* Paste your deployed Apps Script web app URL here */
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwN4IEzkgNkbta8HaBjretgDH9yTIRKBnHmRdhej-vIXaumDGA6pcot6SALX9Jbweas/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxvmC60H1taE3lx9Sl6x_kmlVMkewZBEM-r6_kuU7na0CwNGJR2XAB087fcu27LaWvt/exec";
 
-  let guestList = [];
+  let roster = [];       // [[Display Name, table], ...]
+  let guestList = [];    // uppercase names for autocomplete
   let pageHistory = [];
   const NO_BACK_PAGES = new Set(['page-find', 'page-welcome']);
 
@@ -162,24 +164,35 @@
     o.style.display = on ? 'flex' : 'none';
   }
 
-  const normalize = s => s.replace(/\s+/g, ' ').trim().toUpperCase();
+  const normalize = s => String(s).replace(/\s+/g, ' ').trim().toUpperCase();
 
-  /* ── Load guest names for autocomplete ── */
+  /* ── Roster: loaded once when the page opens, then all lookups happen locally ── */
+  function setRoster(data) {
+    roster = data;
+    guestList = data.map(r => normalize(r[0]));
+  }
+
+  /* Shows the last-known list instantly on a repeat visit, then refreshes it */
   async function loadGuests() {
     const spinner = document.getElementById('nameLoadingSpinner');
+    try { const c = localStorage.getItem('roster'); if (c) setRoster(JSON.parse(c)); } catch (e) {}
     spinner.style.display = 'flex';
-    input.placeholder = 'Loading guest list…';
+    if (!roster.length) input.placeholder = 'Loading guest list…';
     try {
       const res = await fetch(WEB_APP_URL);
-      guestList = await res.json();
-    } catch (err) { console.error('Could not load guest list:', err); }
-    finally {
+      const data = await res.json();
+      setRoster(data);
+      try { localStorage.setItem('roster', JSON.stringify(data)); } catch (e) {}
+    } catch (err) {
+      console.error('Could not load guest list:', err);
+    } finally {
       spinner.style.display = 'none';
       input.placeholder = 'Enter your name here';
     }
   }
-  loadGuests();
+  const rosterReady = loadGuests();
 
+  /* ── Autocomplete ── */
   input.addEventListener('input', function () {
     const q = normalize(this.value);
     suggBox.innerHTML = '';
@@ -199,31 +212,44 @@
     if (!e.target.closest('.name-field-wrap')) suggBox.style.display = 'none';
   });
 
-  /* ── Check in: looks up the guest, marks them checked in, returns table + seatmates ── */
+  /* ── Check in: table + seatmates show instantly, the sheet update happens in the background ── */
   async function checkIn() {
     const name = normalize(input.value);
     suggBox.style.display = 'none';
     if (!name) { showModal('Please enter your name.'); return; }
-    if (guestList.length && !guestList.includes(name)) {
+
+    if (!roster.length) { toggleLoading(true, 'Loading…'); await rosterReady; toggleLoading(false); }
+    if (!roster.length) {
+      showModal('Could not load the guest list. Please check your connection and refresh.');
+      return;
+    }
+
+    const me = roster.find(r => normalize(r[0]) === name);
+    if (!me) {
       showModal('Name not found. Please pick your name from the suggestions or enter it as written on your invitation.');
       return;
     }
 
-    toggleLoading(true, 'Checking in…');
-    try {
-      const res  = await fetch(WEB_APP_URL + '?action=checkIn&name=' + encodeURIComponent(name));
-      const data = await res.json();
-      toggleLoading(false);
-      if (!data.found) { showModal('Name not found. Please check the spelling and try again.'); return; }
-      renderTable(data);
-      show('page-table');
-    } catch (err) {
-      toggleLoading(false);
-      showModal('Error connecting to server. Please check your internet connection.');
-    }
+    const table = me[1];
+    const tablemates = roster
+      .filter(r => r !== me && normalize(r[1]) === normalize(table))
+      .map(r => r[0]);
+
+    renderTable({ table, tablemates });
+    show('page-table');
+    recordCheckIn(name);
+  }
+
+  function recordCheckIn(name, tries = 2) {
+    fetch(WEB_APP_URL + '?action=checkIn&name=' + encodeURIComponent(name), { keepalive: true })
+      .then(r => r.json())
+      .then(d => { if (!d.success) throw 0; })
+      .catch(() => { if (tries > 1) setTimeout(() => recordCheckIn(name, tries - 1), 3000); });
   }
 
   function renderTable(data) {
+    document.querySelector('#page-table .seats-hero-label').innerText =
+      isNaN(data.table) ? 'Table' : 'Table Number';
     document.getElementById('tableNum').innerText = data.table;
     document.getElementById('mapTableNum').innerText = data.table;
 
@@ -236,8 +262,10 @@
       list.appendChild(div);
     });
 
+    /* lowercase so table "VIP" loads seatplan-vip.png */
     document.getElementById('mapHint').style.display = 'block';
-    document.getElementById('mapImg').src = 'seatplan-' + data.table + '.png';
+    document.getElementById('mapImg').src =
+      'seatplan-' + String(data.table).trim().toLowerCase().replace(/\s+/g, '-') + '.png';
   }
 
   /* ── Map ── */
